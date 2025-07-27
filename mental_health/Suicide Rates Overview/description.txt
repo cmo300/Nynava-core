@@ -1,0 +1,17 @@
+Dataset Name: Suicide Rates Overview 1985 to 2016
+
+Source: Kaggle[](https://www.kaggle.com/datasets/szamil/who-suicide-statistics), based on World Health Organization (WHO) data.
+
+Description: This dataset provides anonymized suicide statistics from 1985 to 2016 across 101 countries, broken down by year, age group, gender, and population. It includes raw counts and rates per 100,000 people.
+
+Purpose: Ideal for AI models analyzing mental health trends over time, like predicting risk factors based on demographics. In Nynava, it can support insights on global mental health patterns.
+
+License: CC BY-SA 4.0 (free to use, share, and adapt, but attribute and share alike).
+
+Size: About 50 KB (small CSV file).
+
+Number of Entries: Over 4,000 rows of aggregated data.
+
+Format: Single CSV file (easy to open in Excel or Google Sheets) with columns like country, year, sex, age, suicides_no, population.
+
+Notes: Data is aggregated and anonymized—no individual records. Covers historical trends up to 2016, so supplement with newer data for current AI models. Useful for statistical AI or visualization tools.

@@ -1,0 +1,17 @@
+Dataset Name: COVID-19 Image Dataset
+
+Source: Kaggle[](https://www.kaggle.com/datasets/pranavraikokte/covid19-image-dataset), compiled from various public sources.
+
+Description: This dataset contains anonymized X-ray images categorized into three classes: COVID-19 positive (137 images), normal/healthy lungs (134 images), and viral pneumonia (134 images). Images are high-quality and labeled for classification.
+
+Purpose: Useful for training AI to distinguish COVID-19 from other lung conditions. In Nynava, it can help generate insights on respiratory health from uploaded scans.
+
+License: CC BY 4.0 (free to use for research, but attribute the creator).
+
+Size: About 200 MB (unzipped).
+
+Number of Images: 361 X-rays total.
+
+Format: JPG images in sub-folders by category (Covid, Normal, Viral Pneumonia).
+
+Notes: Data is anonymized—no patient details. It's a small dataset, so good for quick AI tests but combine with larger ones like ChestX-ray14 for better models. Originally compiled for machine learning competitions.

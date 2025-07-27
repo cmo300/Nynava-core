@@ -1,0 +1,17 @@
+Dataset Name: Mental Health in Tech Survey
+
+Source: Open Sourcing Mental Illness (OSMI) via Kaggle[](https://www.kaggle.com/datasets/osmi/mental-health-in-tech-survey).
+
+Description: This dataset contains anonymized survey responses from 1,259 tech industry workers about their mental health experiences at work. It includes questions on topics like treatment seeking, workplace support, remote work impacts, and demographic details (age, gender, country).
+
+Purpose: Useful for building AI models that analyze patterns in mental health, such as predicting stress based on work factors or creating chatbots for support. In Nynava, it can help generate insights on how job stress affects overall health.
+
+License: CC BY-SA 4.0 (free to use, share, and adapt, but attribute the source and share alike).
+
+Size: About 100 KB (small CSV file).
+
+Number of Entries: 1,259 survey responses.
+
+Format: Single CSV file (easy to open in Excel or Google Sheets) with columns for each question.
+
+Notes: Data is anonymized—responses are aggregated without identifiable info. It's from a 2014 survey, so trends might have changed post-pandemic, but it's still valuable for baseline AI training. Cite OSMI when using in projects.

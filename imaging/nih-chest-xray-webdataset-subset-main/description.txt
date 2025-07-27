@@ -1,0 +1,17 @@
+Dataset Name: NIH Chest X-ray14 Subset (1 GB Version)
+
+Source: GitHub repository by MichaelNoya[](https://github.com/MichaelNoya/nih-chest-xray-webdataset-subset). This is a reduced version of the original NIH ChestX-ray14 dataset.
+
+Description: This subset contains approximately 2.4% of the full NIH Chest X-ray14 dataset, with anonymized chest X-ray images labeled for 14 thoracic pathologies (like pneumonia or tumors). It's formatted as a WebDataset for easy use in AI training, making it great for testing diagnostic models without needing the full 45 GB dataset.
+
+Purpose: Ideal for building and testing AI models that detect lung diseases from X-rays. In Nynava, we'll use it to provide basic health insights (e.g., risk scores) as an incentive for patient uploads.
+
+License: Public domain (original NIH data is free for research use; no restrictions on sharing or modification, but cite the source).
+
+Size: About 1 GB (unzipped).
+
+Number of Images: Around 2,500 X-rays (subset of the original 100,000+).
+
+Format: Images in WebDataset (.tar) format, with labels in CSV or metadata files.
+
+Notes: All data is anonymized—no personal info. For full dataset, see original NIH link[](https://nihcc.app.box.com/v/ChestXray-NIHCC). If using in AI, ensure models handle class imbalances (some diseases are rare).
