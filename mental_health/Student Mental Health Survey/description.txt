@@ -1,0 +1,17 @@
+Dataset Name Student Mental Health Survey
+
+Source Kaggle[](httpswww.kaggle.comdatasetsabdullahashfaqvirkstudent-mental-health-survey).
+
+Description This dataset contains anonymized survey responses from students on mental health issues, including questions about depression, anxiety, academic pressure, sleep, and support systems. It covers demographics like age, gender, and study year.
+
+Purpose Useful for AI models predicting mental health risks in students based on lifestyle factors. In Nynava, it can generate insights for young users on balancing school and well-being.
+
+License CC BY 4.0 (free to use for research, attribute the creator).
+
+Size About 50 KB (small CSV file).
+
+Number of Entries Around 100 survey responses.
+
+Format CSV file with columns for each question (e.g., age, course, CGPA, depression status).
+
+Notes Data is fully anonymized—no names or locations. It's from a 2020 survey of international students, so it's recent but small—combine with larger ones like HappyDB for better AI training. Focus on positive applications to avoid bias in predictions.

@@ -1,0 +1,4 @@
+Depression Detection Using Text (Mental Health)
+HappyDB
+Emotions dataset for NLP
+Student Mental Health Survey

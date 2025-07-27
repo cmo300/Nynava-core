@@ -1,0 +1,17 @@
+Dataset Name: HappyDB
+
+Source: Kaggle[](https://www.kaggle.com/datasets/ritresearch/happydb).
+
+Description: This dataset contains over 100,000 anonymized short text entries from people describing moments that make them happy, categorized by topics like family, work, or hobbies. It includes demographic info like age and gender (aggregated, no identifiers).
+
+Purpose: Great for AI models studying positive emotions, like generating mood-boosting suggestions or analyzing happiness patterns. In Nynava, it can power insights on what improves mental well-being based on user inputs.
+
+License: CC BY-SA 4.0 (free to use, share, and adapt, but attribute and share alike).
+
+Size: About 10 MB (CSV files).
+
+Number of Entries: 100,530 happy moments.
+
+Format: CSV files with columns for text description, predicted category, and demographics.
+
+Notes: Data is anonymized—responses are crowd-sourced without personal details. It's from a 2017 study, so trends might have evolved, but it's excellent for NLP (natural language processing) AI. Cite the Research in Text (RIT) group when using.

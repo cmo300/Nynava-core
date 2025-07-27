@@ -1,0 +1,17 @@
+Dataset Name: Depression Detection Using Text
+
+Source: Kaggle[](https://www.kaggle.com/datasets/diegosilvadefrana/depression-dataset).
+
+Description: This dataset contains anonymized text samples labeled as "depressed" or "not depressed," drawn from online sources like forums and social media. It includes sentences or paragraphs that reflect emotional states, with balanced classes for training.
+
+Purpose: Useful for building AI models that analyze text to detect signs of depression, such as in chatbots or sentiment analysis tools. In Nynava, it can help generate insights on mental health from written inputs or surveys.
+
+License: CC BY 4.0 (free to use for research, but attribute the creator).
+
+Size: About 200 KB (small CSV file).
+
+Number of Entries: Around 1,000 text samples (depending on the version downloaded).
+
+Format: CSV file with columns for text and label (depressed/not depressed).
+
+Notes: Data is fully anonymized—no user identifiers or personal details. It's a small dataset, so good for quick AI tests, but combine with larger ones like HappyDB for better models. Focus on ethical use to avoid stigmatizing language in AI outputs.

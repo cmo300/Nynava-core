@@ -1,0 +1,17 @@
+Dataset Name: Emotions Dataset for NLP
+
+Source: Kaggle[](https://www.kaggle.com/datasets/praveengovi/emotions-dataset-for-nlp).
+
+Description: This dataset has anonymized text sentences labeled with 6 emotions (joy, sadness, anger, fear, love, surprise). It's sourced from various texts like books and online posts, balanced across categories.
+
+Purpose: Ideal for training AI to classify emotions in text, such as detecting mood in mental health chats or journals. In Nynava, it can help create tools for emotional support or sentiment tracking.
+
+License: CC BY 4.0 (free for research use, attribute the creator).
+
+Size: About 1 MB (text files).
+
+Number of Entries: Around 20,000 sentences (train, test, validation splits).
+
+Format: TXT files (one per split: train.txt, test.txt, val.txt) with text and emotion label separated by semicolons.
+
+Notes: Data is anonymized—no source identifiers. It's a clean, multi-label dataset for natural language processing (NLP) AI. Good for beginners, but expand with real-world data for accuracy in health apps.
