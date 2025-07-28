@@ -1,0 +1,24 @@
+Dataset Name: PadChest Chest X-rays (Sample)
+
+Source:
+- Official sample from the PadChest dataset, hosted on Kaggle[](https://www.kaggle.com/raddar/padchest-chest-xrays-sample)
+- Original full dataset from BIMCV (Medical Imaging Bank of the Valencia Region) at http://bimcv.cipf.es/bimcv-projects/padchest/
+
+Overview:
+- This is a sample subset of the PadChest dataset, containing high-resolution, anonymized chest X-ray images with multi-label annotations for various pathologies (e.g., pneumonia, tumors, heart conditions). The labels are derived from radiological reports, including details like view position and patient demographics (aggregated, no identifiers).
+
+Purpose:
+- Ideal for training and testing AI models for automated chest X-ray interpretation and disease detection. In Nynava, it can support insights on respiratory and thoracic health from uploaded scans, enhancing diagnostic tools.
+
+License:
+- CC BY-NC-SA 4.0 (free for non-commercial research use; attribution required, share-alike, no commercial derivatives). Always cite the BIMCV source in publications.
+
+Technical Details:
+- Size: Sample is approximately 1-2 GB (full dataset is ~100k studies, but sample is smaller for ease)
+- Number of Images: Around 1,000-5,000 X-rays in the sample (exact varies by download version)
+- Format: DICOM or PNG images with CSV labels for pathologies and reports
+
+Notes:
+- Fully anonymized—no personal identifiable information; suitable for AI research under ethical guidelines.
+- The sample is a representative subset of the full ~160,000 image dataset; for more data, request access to the complete PadChest via the official site.
+- Useful for multi-label classification AI; consider combining with datasets like ChestX-ray14 for better model accuracy.
