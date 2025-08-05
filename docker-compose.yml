@@ -1,0 +1,258 @@
+version: '3.8'
+
+services:
+  # Nynava Backend API
+  nynava-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nynava-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=postgresql://nynava_user:nynava_pass@postgres:5432/nynava_db
+      - REDIS_URL=redis://redis:6379/0
+      - IPFS_NODE_URL=http://ipfs:5001
+      - HYPERLEDGER_PEER_URL=grpc://hyperledger-peer:7051
+      - HYPERLEDGER_ORDERER_URL=grpc://hyperledger-orderer:7050
+      - FLOWER_SERVER_ADDRESS=localhost:8080
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-your-secret-key-here}
+      - HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY}
+    volumes:
+      - ./backend:/app
+      - nynava-data:/app/data
+    depends_on:
+      - postgres
+      - redis
+      - ipfs
+    networks:
+      - nynava-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend Web Server
+  nynava-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nynava-frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    networks:
+      - nynava-network
+    restart: unless-stopped
+    depends_on:
+      - nynava-backend
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: nynava-postgres
+    environment:
+      - POSTGRES_DB=nynava_db
+      - POSTGRES_USER=nynava_user
+      - POSTGRES_PASSWORD=nynava_pass
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - nynava-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nynava_user -d nynava_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: nynava-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - nynava-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-nynava-redis-pass}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # IPFS Node for Decentralized Storage
+  ipfs:
+    image: ipfs/go-ipfs:latest
+    container_name: nynava-ipfs
+    ports:
+      - "4001:4001"
+      - "5001:5001"
+      - "8080:8080"
+    volumes:
+      - ipfs-data:/data/ipfs
+    networks:
+      - nynava-network
+    restart: unless-stopped
+    environment:
+      - IPFS_PROFILE=server
+    healthcheck:
+      test: ["CMD", "ipfs", "id"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Hyperledger Fabric Peer (Simplified for Demo)
+  hyperledger-peer:
+    image: hyperledger/fabric-peer:2.4
+    container_name: nynava-hyperledger-peer
+    environment:
+      - CORE_PEER_ID=peer0.nynava.com
+      - CORE_PEER_ADDRESS=peer0.nynava.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.nynava.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.nynava.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.nynava.com:7051
+      - CORE_PEER_LOCALMSPID=NynavaMSP
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=nynava_nynava-network
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=false
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./hyperledger/peer:/etc/hyperledger/fabric/msp
+      - hyperledger-peer-data:/var/hyperledger/production
+    ports:
+      - "7051:7051"
+    networks:
+      - nynava-network
+    restart: unless-stopped
+
+  # Hyperledger Fabric Orderer (Simplified for Demo)
+  hyperledger-orderer:
+    image: hyperledger/fabric-orderer:2.4
+    container_name: nynava-hyperledger-orderer
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      - ORDERER_GENERAL_TLS_ENABLED=false
+    volumes:
+      - ./hyperledger/orderer:/var/hyperledger/orderer/msp
+      - ./hyperledger/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - hyperledger-orderer-data:/var/hyperledger/production/orderer
+    ports:
+      - "7050:7050"
+    networks:
+      - nynava-network
+    restart: unless-stopped
+
+  # Federated Learning Flower Server
+  flower-server:
+    build:
+      context: ./federated_learning
+      dockerfile: Dockerfile.server
+    container_name: nynava-flower-server
+    ports:
+      - "8080:8080"
+    environment:
+      - FL_ROUNDS=10
+      - FL_MIN_CLIENTS=2
+    networks:
+      - nynava-network
+    restart: unless-stopped
+    depends_on:
+      - nynava-backend
+
+  # Monitoring with Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: nynava-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - nynava-network
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+
+  # Grafana for Monitoring Dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nynava-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - nynava-network
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: nynava-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    networks:
+      - nynava-network
+    restart: unless-stopped
+    depends_on:
+      - nynava-frontend
+      - nynava-backend
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  ipfs-data:
+    driver: local
+  hyperledger-peer-data:
+    driver: local
+  hyperledger-orderer-data:
+    driver: local
+  nynava-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  nynava-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

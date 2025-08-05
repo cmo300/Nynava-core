@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nynava - Secure Data Upload</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-number {
+            background: #4facfe;
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: #10b981;
+            color: white;
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .file-upload-area {
+            border: 3px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #f8fafc;
+        }
+
+        .file-upload-area:hover {
+            border-color: #4facfe;
+            background: #f0f9ff;
+        }
+
+        .file-upload-area.dragover {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .file-upload-icon {
+            font-size: 3rem;
+            color: #9ca3af;
+            margin-bottom: 15px;
+        }
+
+        .file-upload-text {
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-hint {
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .file-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .file-icon {
+            margin-right: 12px;
+            color: #4facfe;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .file-size {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-left: 8px;
+        }
+
+        .file-remove {
+            color: #ef4444;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background 0.2s ease;
+        }
+
+        .file-remove:hover {
+            background: #fee2e2;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 12px;
+            margin-top: 2px;
+            transform: scale(1.2);
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        .privacy-notice {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .privacy-notice h4 {
+            color: #1e40af;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .privacy-notice h4 i {
+            margin-right: 8px;
+        }
+
+        .privacy-notice p {
+            color: #1e40af;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .upload-status {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .upload-status.show {
+            display: block;
+        }
+
+        .status-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .status-success {
+            color: #10b981;
+        }
+
+        .status-error {
+            color: #ef4444;
+        }
+
+        .anonymization-preview {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .anonymization-preview h4 {
+            color: #374151;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .anonymization-preview h4 i {
+            margin-right: 8px;
+            color: #10b981;
+        }
+
+        .anonymization-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .anonymization-item:last-child {
+            border-bottom: none;
+        }
+
+        .responsive-table {
+            overflow-x: auto;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .step-indicator {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> Nynava</h1>
+            <p>Secure, HIPAA-Compliant Medical Data Upload</p>
+        </div>
+
+        <div class="content">
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <span>Consent</span>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <span>Upload</span>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <span>Review</span>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <span>Complete</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <form id="uploadForm">
+                <!-- Step 1: Consent -->
+                <div class="form-section active" data-section="1">
+                    <h3 style="margin-bottom: 25px; color: #374151;">
+                        <i class="fas fa-file-contract"></i> Data Consent Agreement
+                    </h3>
+
+                    <div class="privacy-notice">
+                        <h4><i class="fas fa-info-circle"></i> Your Privacy is Our Priority</h4>
+                        <p>All data uploaded to Nynava is automatically anonymized using advanced AI techniques. Personal identifiers are removed or replaced before storage. Your data contributes to medical research while maintaining complete privacy.</p>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="generalConsent" name="generalConsent" required>
+                        <label for="generalConsent">
+                            <strong>I consent to my anonymized data being used for general medical AI research.</strong>
+                            This helps advance healthcare AI while protecting your privacy.
+                        </label>
+                    </div>
+
+                    <h4 style="margin: 25px 0 15px 0; color: #374151;">Research Opt-Outs (Optional)</h4>
+                    <p style="margin-bottom: 20px; color: #6b7280;">You can opt out of specific research areas while still contributing to general medical research:</p>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="cancerOptOut" name="cancerOptOut">
+                        <label for="cancerOptOut">Opt out of cancer-related research</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="mentalHealthOptOut" name="mentalHealthOptOut">
+                        <label for="mentalHealthOptOut">Opt out of mental health studies</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="heartDiseaseOptOut" name="heartDiseaseOptOut">
+                        <label for="heartDiseaseOptOut">Opt out of cardiovascular research</label>
+                    </div>
+
+                    <div class="privacy-notice" style="background: #fef3c7; border-color: #fbbf24;">
+                        <h4 style="color: #92400e;"><i class="fas fa-exclamation-triangle"></i> Important</h4>
+                        <p style="color: #92400e;">You can withdraw your consent at any time by contacting support@nynava.com. Your data will be removed from future research within 30 days.</p>
+                    </div>
+                </div>
+
+                <!-- Step 2: File Upload -->
+                <div class="form-section" data-section="2">
+                    <h3 style="margin-bottom: 25px; color: #374151;">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload Your Medical Data
+                    </h3>
+
+                    <div class="form-group">
+                        <label for="dataCategory">Data Category</label>
+                        <select id="dataCategory" name="dataCategory" class="form-control" required>
+                            <option value="">Select data type...</option>
+                            <option value="imaging">Medical Imaging (X-rays, MRI, CT scans)</option>
+                            <option value="mental_health">Mental Health Records</option>
+                            <option value="general">General Medical Records</option>
+                            <option value="genomics">Genomic Data</option>
+                            <option value="lab_results">Laboratory Results</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload Files</label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <div class="file-upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="file-upload-text">
+                                Drag and drop your files here, or click to browse
+                            </div>
+                            <div class="file-upload-hint">
+                                Supported formats: PDF, JPG, PNG, DICOM, CSV, JSON (Max 100MB per file)
+                            </div>
+                            <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.dcm,.csv,.json" style="display: none;">
+                        </div>
+                        <div class="file-list" id="fileList"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dataDescription">Data Description (Optional)</label>
+                        <textarea id="dataDescription" name="dataDescription" class="form-control" rows="3" 
+                                  placeholder="Briefly describe your data (e.g., 'Chest X-rays from 2023', 'Blood test results')"></textarea>
+                    </div>
+                </div>
+
+                <!-- Step 3: Review & Anonymization -->
+                <div class="form-section" data-section="3">
+                    <h3 style="margin-bottom: 25px; color: #374151;">
+                        <i class="fas fa-user-shield"></i> Review & Anonymization Preview
+                    </h3>
+
+                    <div class="anonymization-preview">
+                        <h4><i class="fas fa-eye-slash"></i> Anonymization Process</h4>
+                        <div id="anonymizationDetails">
+                            <div class="anonymization-item">
+                                <span>Personal Names</span>
+                                <span style="color: #10b981;"><i class="fas fa-check"></i> Will be removed</span>
+                            </div>
+                            <div class="anonymization-item">
+                                <span>Addresses & Phone Numbers</span>
+                                <span style="color: #10b981;"><i class="fas fa-check"></i> Will be removed</span>
+                            </div>
+                            <div class="anonymization-item">
+                                <span>Medical Record Numbers</span>
+                                <span style="color: #10b981;"><i class="fas fa-check"></i> Will be anonymized</span>
+                            </div>
+                            <div class="anonymization-item">
+                                <span>Dates</span>
+                                <span style="color: #f59e0b;"><i class="fas fa-edit"></i> Will be date-shifted</span>
+                            </div>
+                            <div class="anonymization-item">
+                                <span>Ages > 89</span>
+                                <span style="color: #f59e0b;"><i class="fas fa-edit"></i> Will be grouped as 90+</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="privacy-notice">
+                        <h4><i class="fas fa-lock"></i> Data Security</h4>
+                        <p>Your anonymized data will be stored on IPFS (decentralized storage) and your consent will be recorded on our blockchain for transparency and immutability. Only anonymized data is used for research.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="finalConfirmation" name="finalConfirmation" required>
+                            <label for="finalConfirmation">
+                                <strong>I confirm that I have reviewed the anonymization process and consent to proceed with the upload.</strong>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Upload Status -->
+                <div class="form-section" data-section="4">
+                    <div class="upload-status" id="uploadStatus">
+                        <div class="status-icon" id="statusIcon">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <h3 id="statusTitle">Processing Your Upload...</h3>
+                        <p id="statusMessage">Please wait while we securely process and anonymize your data.</p>
+                        <div class="progress-bar" style="margin: 20px auto; max-width: 300px;">
+                            <div class="progress-fill" id="uploadProgress"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button type="button" class="btn btn-primary" id="nextBtn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                        <i class="fas fa-upload"></i> Upload Data
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Form state management
+        let currentStep = 1;
+        let uploadedFiles = [];
+        const totalSteps = 4;
+
+        // DOM elements
+        const form = document.getElementById('uploadForm');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const progressFill = document.getElementById('progressFill');
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+            setupFileUpload();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            nextBtn.addEventListener('click', nextStep);
+            prevBtn.addEventListener('click', prevStep);
+            form.addEventListener('submit', handleSubmit);
+        }
+
+        function setupFileUpload() {
+            fileUploadArea.addEventListener('click', () => fileInput.click());
+            fileUploadArea.addEventListener('dragover', handleDragOver);
+            fileUploadArea.addEventListener('dragleave', handleDragLeave);
+            fileUploadArea.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            fileUploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            addFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            addFiles(files);
+        }
+
+        function addFiles(files) {
+            files.forEach(file => {
+                if (file.size > 100 * 1024 * 1024) { // 100MB limit
+                    alert(`File ${file.name} is too large. Maximum size is 100MB.`);
+                    return;
+                }
+                
+                uploadedFiles.push({
+                    file: file,
+                    id: Date.now() + Math.random(),
+                    name: file.name,
+                    size: formatFileSize(file.size),
+                    type: file.type
+                });
+            });
+            
+            renderFileList();
+        }
+
+        function removeFile(fileId) {
+            uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
+            renderFileList();
+        }
+
+        function renderFileList() {
+            if (uploadedFiles.length === 0) {
+                fileList.innerHTML = '';
+                return;
+            }
+
+            fileList.innerHTML = uploadedFiles.map(file => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <i class="fas ${getFileIcon(file.type)} file-icon"></i>
+                        <span class="file-name">${file.name}</span>
+                        <span class="file-size">(${file.size})</span>
+                    </div>
+                    <i class="fas fa-times file-remove" onclick="removeFile(${file.id})"></i>
+                </div>
+            `).join('');
+        }
+
+        function getFileIcon(fileType) {
+            if (fileType.includes('image')) return 'fa-image';
+            if (fileType.includes('pdf')) return 'fa-file-pdf';
+            if (fileType.includes('csv')) return 'fa-file-csv';
+            if (fileType.includes('json')) return 'fa-file-code';
+            return 'fa-file';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function nextStep() {
+            if (!validateCurrentStep()) return;
+            
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+                updateProgress();
+                updateButtons();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+                updateProgress();
+                updateButtons();
+            }
+        }
+
+        function showStep(step) {
+            // Hide all sections
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show current section
+            document.querySelector(`[data-section="${step}"]`).classList.add('active');
+            
+            // Update step indicators
+            document.querySelectorAll('.step').forEach((stepEl, index) => {
+                stepEl.classList.remove('active', 'completed');
+                if (index + 1 < step) {
+                    stepEl.classList.add('completed');
+                } else if (index + 1 === step) {
+                    stepEl.classList.add('active');
+                }
+            });
+
+            // Show upload status for step 4
+            if (step === 4) {
+                document.getElementById('uploadStatus').classList.add('show');
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            progressFill.style.width = progress + '%';
+        }
+
+        function updateButtons() {
+            prevBtn.style.display = currentStep > 1 ? 'inline-flex' : 'none';
+            nextBtn.style.display = currentStep < totalSteps ? 'inline-flex' : 'none';
+            submitBtn.style.display = currentStep === 3 ? 'inline-flex' : 'none';
+        }
+
+        function validateCurrentStep() {
+            switch (currentStep) {
+                case 1:
+                    if (!document.getElementById('generalConsent').checked) {
+                        alert('Please provide consent for general medical research to proceed.');
+                        return false;
+                    }
+                    break;
+                case 2:
+                    if (!document.getElementById('dataCategory').value) {
+                        alert('Please select a data category.');
+                        return false;
+                    }
+                    if (uploadedFiles.length === 0) {
+                        alert('Please upload at least one file.');
+                        return false;
+                    }
+                    break;
+                case 3:
+                    if (!document.getElementById('finalConfirmation').checked) {
+                        alert('Please confirm that you have reviewed the anonymization process.');
+                        return false;
+                    }
+                    break;
+            }
+            return true;
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            
+            if (!validateCurrentStep()) return;
+            
+            // Move to upload status step
+            currentStep = 4;
+            showStep(currentStep);
+            updateProgress();
+            updateButtons();
+            
+            try {
+                // Simulate upload process
+                await simulateUpload();
+                
+                // Show success
+                showUploadSuccess();
+                
+            } catch (error) {
+                console.error('Upload failed:', error);
+                showUploadError(error.message);
+            }
+        }
+
+        async function simulateUpload() {
+            const statusIcon = document.getElementById('statusIcon');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusMessage = document.getElementById('statusMessage');
+            const uploadProgress = document.getElementById('uploadProgress');
+            
+            // Simulate upload progress
+            for (let i = 0; i <= 100; i += 10) {
+                uploadProgress.style.width = i + '%';
+                
+                if (i === 30) {
+                    statusMessage.textContent = 'Anonymizing your data...';
+                } else if (i === 60) {
+                    statusMessage.textContent = 'Storing on IPFS...';
+                } else if (i === 90) {
+                    statusMessage.textContent = 'Recording consent on blockchain...';
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+        }
+
+        function showUploadSuccess() {
+            const statusIcon = document.getElementById('statusIcon');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            statusIcon.innerHTML = '<i class="fas fa-check-circle status-success"></i>';
+            statusTitle.textContent = 'Upload Successful!';
+            statusMessage.innerHTML = `
+                <p>Your data has been successfully uploaded and anonymized.</p>
+                <p><strong>Consent Hash:</strong> <code>0x${Math.random().toString(16).substr(2, 8)}</code></p>
+                <p><strong>IPFS Hash:</strong> <code>Qm${Math.random().toString(36).substr(2, 9)}</code></p>
+                <div style="margin-top: 20px;">
+                    <a href="vault_dashboard.html" class="btn btn-primary">
+                        <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                    </a>
+                </div>
+            `;
+        }
+
+        function showUploadError(message) {
+            const statusIcon = document.getElementById('statusIcon');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            statusIcon.innerHTML = '<i class="fas fa-exclamation-circle status-error"></i>';
+            statusTitle.textContent = 'Upload Failed';
+            statusMessage.innerHTML = `
+                <p>There was an error processing your upload: ${message}</p>
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                </div>
+            `;
+        }
+
+        // Initialize the form
+        updateButtons();
+    </script>
+</body>
+</html>
